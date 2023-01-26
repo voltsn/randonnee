@@ -83,6 +83,14 @@
 			<label for="height_difference">Dénivelé</label>
 			<input type="text" name="height_difference" value="">
 		</div>
+    <div>
+      Disponible:
+      <label for="available-yes">Oui</label>
+      <input type="radio" name="available" id="available-yes" value="yes">
+      
+      <label for="available-no">Non</label>
+      <input type="radio" name="available" id="available-no" value="no">
+    </div>
 		<button type="submit" name="button">Envoyer</button>
 	</form>
 </body>
