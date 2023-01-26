@@ -43,7 +43,7 @@
             $duration = date('H:i',strtotime($row["duration"])); 
             echo "
                   <tr>
-                    <td>$row[name]</td>
+                    <td><a href='./update.php/?id=$row[id]'>$row[name]</a></td>
                     <td>$row[difficulty]</td> 
                     <td>$distance km</td>
                     <td>$duration</td>
