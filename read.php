@@ -35,12 +35,15 @@
                    <th> Distance </th>
                    <th> Duree </th>
                    <th> Déniv.+ </th>
+                   <th> Available </th>
                   </theader>
                   <tbody>      
           ";
           foreach ($data as $row) {
             $distance = number_format($row["distance"] / 1000, 2);
             $duration = date('H:i',strtotime($row["duration"])); 
+            $available = ((int) $row['available'] == 1) ? "yes" : "no";
+
             echo "
                   <tr>
                     <td><a href='./update.php/?id=$row[id]'>$row[name]</a></td>
@@ -48,6 +51,7 @@
                     <td>$distance km</td>
                     <td>$duration</td>
                     <td>$row[height_difference] m</td>
+                    <td>$available</td> 
                     <td><a href='./delete.php/?id=$row[id]'>Delete</a><td>
                   </tr>
             ";
