@@ -48,6 +48,7 @@
                     <td>$distance km</td>
                     <td>$duration</td>
                     <td>$row[height_difference] m</td>
+                    <td><a href='./delete.php/?id=$row[id]'>Delete</a><td>
                   </tr>
             ";
           }
