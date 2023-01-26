@@ -2,7 +2,7 @@
   require "./config.php";
   session_start();
   
-  $name = $diff = $dist = $dur = $height_diff = NULL;
+  $name = $diff = $dist = $dur = $height_diff = $available = NULL;
   if (isset($_GET["id"])){
     // Get id from the URL 
     $id = intval($_GET["id"]);
@@ -25,15 +25,15 @@
       $dist = $data['distance'];
       $dur = $data['duration'];
       $height_diff = $data['height_difference'];
+      $available = (int) $data['available'];
 
     } catch(PDOExecption $e){
       $error = TRUE;
     }
   }
 
-  
+  // Update hike in the database
   if (isset($_POST['button']) && isset($_SESSION['id'])){
-    // Update hike in the database
     $db_conn = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpassword);
 
     $name = $_POST['name'];
@@ -41,9 +41,10 @@
     $dist = $_POST['distance'];
     $dur = $_POST['duration'];
     $height_diff = $_POST['height_difference'];
+    $available = ($_POST['available'] == "yes") ? 1 : 0;
 
     $update_query = "UPDATE hiking 
-                     SET name = :name, difficulty = :diff, distance = :dist, duration = :dur, height_difference = :height_diff 
+                     SET name = :name, difficulty = :diff, distance = :dist, duration = :dur, height_difference = :height_diff, available = :available 
                      WHERE id = :id";
 
     $query = $db_conn->prepare($update_query);
@@ -55,6 +56,7 @@
      'dist' => $dist,
      'dur' => $dur,
      'height_diff' => $height_diff, 
+     'available' => $available,
      'id' => $_SESSION['id']
     ]);
   }
@@ -69,7 +71,7 @@
 <body>
 	<a href="./read.php">Liste des données</a>
 	<h1>Ajouter</h1>
-	<form action="" method="post">
+	<form action="." method="post">
     <div>
       <label for="name">Name</label>
       <input type="text" name="name" value="<?php echo $name ? $name : '';?> ">
@@ -97,6 +99,14 @@
     <div>
       <label for="height_difference">Dénivelé</label>
       <input type="text" name="height_difference" value="<?php echo $height_diff ? $height_diff : ''; ?>">
+    </div>
+    <div>
+      Disponible:
+      <label for="available-yes">Oui</label>
+      <input type="radio" name="available" id="available-yes" value="yes" <?php echo ($available == 1) ? "checked" : ""?>>
+      
+      <label for="available-no">Non</label>
+      <input type="radio" name="available" id="available-no" value="no" <?php echo ($available == 0) ? "checked" : ""?>>
     </div>
 		<button type="submit" name="button">Envoyer</button>
 	</form>
