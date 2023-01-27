@@ -42,24 +42,44 @@
     $dur = $_POST['duration'];
     $height_diff = $_POST['height_difference'];
     $available = ($_POST['available'] == "yes") ? 1 : 0;
+    $form_errors = [];
 
-    $update_query = "UPDATE hiking 
-                     SET name = :name, difficulty = :diff, distance = :dist, duration = :dur, height_difference = :height_diff, available = :available 
-                     WHERE id = :id";
+    // Ensure that distance, height_difference and duration are numbers 
+    $dist = filter_var($_POST["distance"], FILTER_SANITIZE_NUMBER_INT);
+    if (!$dist){
+      $form_errors["distance"] = "Distance must be a number";
+    }
 
-    $query = $db_conn->prepare($update_query);
+    $dur = filter_var($_POST["duration"], FILTER_SANITIZE_NUMBER_INT);
+    if(!$dur){
+      $form_errors["duration"] = "Duration must be a number";
+    }
 
-    // Execute query
-    $result = $query->execute([
-     'name' => $name,
-     'diff' => $diff,
-     'dist' => $dist,
-     'dur' => $dur,
-     'height_diff' => $height_diff, 
-     'available' => $available,
-     'id' => $_SESSION['id']
-    ]);
-  }
+    $height_difference = filter_var($_POST["height_difference"], FILTER_SANITIZE_NUMBER_INT);
+    if(!$height_difference){
+      $form_errors["height_diff"] = "Height difference must be a number";
+    }
+
+    if (count($form_errors) == 0){
+
+      $update_query = "UPDATE hiking 
+                       SET name = :name, difficulty = :diff, distance = :dist, duration = :dur, height_difference = :height_diff, available = :available 
+                       WHERE id = :id";
+
+      $query = $db_conn->prepare($update_query);
+
+      // Execute query
+      $result = $query->execute([
+       'name' => $name,
+       'diff' => $diff,
+       'dist' => $dist,
+       'dur' => $dur,
+       'height_diff' => $height_diff, 
+       'available' => $available,
+       'id' => $_SESSION['id']
+      ]);
+    }
+   }
 ?>
 <!DOCTYPE html>
 <html>

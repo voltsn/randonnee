@@ -2,37 +2,52 @@
 	require "./config.php";
 	
 	if (isset($_POST["button"])){
+    $form_errors = [];
 		$name = $_POST["name"];
 		$diff = $_POST["difficulty"];
-		$dist = $_POST["distance"];
-		$dur = $_POST["duration"];
-		$height_diff = $_POST["height_difference"];
 
 		// Convert to meters
 		$dist = intval($dist) * 1000;
-			
-		$query_status;
-		try{
+    
+    // Ensure that distance, height_difference and duration are numbers 
+    $dist = filter_var($_POST["distance"], FILTER_SANITIZE_NUMBER_INT);
+    if (!$dist){
+      $form_errors["distance"] = "Distance must be a number";
+    }
 
-			// Connect to the database
-			$db_conn = new PDO("mysql:host=$dbhost; dbname=$dbname", $dbuser, $dbpassword);
-			
-			// Prepare query
-			$insert_query = "INSERT INTO hiking (name, difficulty, distance, duration, height_difference) VALUES(:name, :diff, :dist, FROM_UNIXTIME(:dur, '%H:%i:%s'), :height_diff)";
-			$prepared_query = $db_conn->prepare($insert_query);
+    $dur = filter_var($_POST["duration"], FILTER_SANITIZE_NUMBER_INT);
+    if(!$dur){
+      $form_errors["duration"] = "Duration must be a number";
+    }
 
-			// Execute query
-			$query_status = $prepared_query->execute([
-				"name" => $name,
-				"diff" => $diff,
-				"dist" => $dist,
-				"dur" => strtotime($dur),
-				"height_diff" => $height_diff
-			]);
+    $height_difference = filter_var($_POST["height_difference"], FILTER_SANITIZE_NUMBER_INT);
+    if(!$height_difference){
+      $form_errors["height_diff"] = "Height difference must be a number";
+    }
 
-		} catch (PDOException $e) {
-			$query_status = FALSE;
-		}
+    $query_status;
+    if (count($form_errors) == 0){
+        try{
+          // Connect to the database
+          $db_conn = new PDO("mysql:host=$dbhost; dbname=$dbname", $dbuser, $dbpassword);
+          
+          // Prepare query
+          $insert_query = "INSERT INTO hiking (name, difficulty, distance, duration, height_difference) VALUES(:name, :diff, :dist, FROM_UNIXTIME(:dur, '%H:%i:%s'), :height_diff)";
+          $prepared_query = $db_conn->prepare($insert_query);
+
+          // Execute query
+          $query_status = $prepared_query->execute([
+            "name" => $name,
+            "diff" => $diff,
+            "dist" => $dist,
+            "dur" => strtotime($dur),
+            "height_diff" => $height_diff
+          ]);
+
+        } catch (PDOException $e) {
+          $query_status = FALSE;
+        }
+    }
 	}
 ?>
 <!DOCTYPE html>
@@ -72,8 +87,15 @@
 		</div>
 
 		<div>
+      <?php echo isset($form_errors["distance"]) ? "<p> $form_errors[distance] </p>" : "";?>
 			<label for="distance">Distance</label>
-			<input type="text" name="distance" value="">
+      <input type="text" name="distance" value="" 
+       <?php 
+          if(isset($form_errors["distance"]){
+            echo "style=outline:red;";
+          }
+       ?>
+      >
 		</div>
 		<div>
 			<label for="duration">Durée</label>
